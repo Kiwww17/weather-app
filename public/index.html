@@ -11,14 +11,10 @@
     <title>Weather App</title>
 </head>
 
-<body class="bg-gray-900">
+<body class="bg-gray-900 mx-auto flex justify-center items-center w-full h-screen">
 
     <!-- App wrapper -->
     <div class="flex flex-col gap-12 p-8 w-full h-fit justify-center items-center">
-
-        
-
-        
         <!-- Display -->
         <section
             class="w-fit h-fit lg:max-w-75 p-4 flex flex-col gap-8 justify-center items-center bg-linear-to-tl from-gray-800 via-blue-600 to-blue-400 rounded-lg drop-shadow-md drop-shadow-gray-400/65">
@@ -35,10 +31,9 @@
                     class="flex flex-row lg:max-w-75 w-full h-fit  justify-center items-center gap-2 lg:mx-auto rounded-md transition-all duration-300 scale-0"
                     id="form">
                     <input type="text" id="city"
-                        class="bg-gray-300/30 w-48 h-6 rounded-md font-semibold text-gray-900 appearance-none outline-0 border-0 p-2 focus:bg-gray-300"
-                        placeholder="Enter City Name">
+                        class="bg-gray-300/30 w-48 h-6 rounded-md font-semibold text-gray-900 appearance-none outline-0 border-0 p-2 focus:bg-gray-300 relative" placeholder="Enter City or Country">
                     <button type="submit" id="btnSubmit"
-                        class="w-6 h-6 flex p-1 justify-center items-center text-lg  bg-gray-300/30 rounded-full cursor-pointer active:opacity-90 active:scale-95">🔎</button>
+                        class="w-6 h-6 flex p-1 justify-center items-center text-lg  bg-gray-300/30 rounded-full cursor-pointer active:opacity-90 active:scale-95"><img src="./icon/magnifying-glass-solid-full.svg"></button>
                 </form>
                 <!-- End Of Form -->
             </nav>
@@ -49,12 +44,12 @@
                 <h4 class="text-lg text-white font-semibold text-center" id="date"></h4>
             </header>
 
-            <figure class="h-fit w-full -mt-12">
-                <figure id="icon" class="flex justify-center">
+            <figure id="icon" class="flex flex-col justify-center h-fit w-full items-center">
 
-                </figure>
-                <p class="text-[18px] h-full w-full text-center text-gray-200 font-semibold" id="description"></p>
+                <figcaption class="text-[18px] h-full w-full text-center text-gray-200 font-semibold order-2" id="description"></figcaption>
             </figure>
+            
+            <!-- <div class="h-fit w-full -mt-12"></div> -->
 
             <!-- Temp -->
             <div>
