@@ -11,67 +11,78 @@ window.addEventListener('load', () => {
         form.classList.toggle('scale-100');
     });
 
-    const city = document.getElementById('city');
-    const cityName = localStorage.getItem('cityName' || '');
+    const cityInput = document.getElementById('city');
+    const cityName = localStorage.getItem('cityName') || '';
 
-    city.value = cityName;
+    cityInput.value = cityName;
     const displayCity = document.getElementById('displayCity');
 
     displayCity.textContent = cityName;
 
-    city.addEventListener('input', e => {
+    cityInput.addEventListener('input', e => {
         localStorage.setItem('cityName', e.target.value.toUpperCase());
     })
 
-    btnSubmit.addEventListener('submit', (e) => {
+    btnSubmit.addEventListener('submit', async (e) => {
         e.preventDefault();
         const city = document.getElementById('city').value;
+
+        const result = await getWeather(city);
+
+        runWeather(result);
 
     })
 
 
-    getFullDay((a, b, c) => {
+    getFullDay((dayWeek, hour, minutes) => {
         let day = '';
-        b = String(b);
-        c = String(c);
+        hour = String(hour);
+        minutes = String(minutes);
 
 
-        if (a == 1) {
+        if (dayWeek == 1) {
             day = 'MONDAY';
-        } else if (a == 2) {
-            day = 'TUESDAY';
-        } else if (a == 3) {
+        } else if (dayWeek == 2) {
+            day = 'TUESDAY'; dayWeek
+        } else if (dayWeek == 3) {
             day = 'WEDNESDAY';
-        } else if (a == 4) {
+        } else if (dayWeek == 4) {
             day = 'THURSDAY';
-        } else if (a == 5) {
+        } else if (dayWeek == 5) {
             day = 'FRIDAY';
-        } else if (a == 6) {
+        } else if (dayWeek == 6) {
             day = 'SATURDAY';
         } else {
             day = 'SUNDAY';
         }
 
         let desc = '';
-        if (b == 0 && b < 12) {
+        if (hour < 12) {
             desc = 'AM';
         } else {
             desc = 'PM';
         }
-        date.textContent = `${day}, ${b.padStart(2, 0)}.${c.padStart(2, 0)} ${desc}`;
+        date.textContent = `${day}, ${hour.padStart(2, 0)}.${minutes.padStart(2, 0)} ${desc}`;
     })
 
     async function runWeather() {
-        const hasil = await getWeather(cityName);
-        
-        if (hasil.cod != '404') {
-            
-            const iconRaw = hasil.weather[0].main;
-            const descRaw = hasil.weather[0].description;
-            const wind = hasil.wind.speed;
-            const absTemp = hasil.main.temp;
-            const feelsTemp = hasil.main.feels_like;
-            const sunriseTimestamp = hasil.sys.sunrise;
+        const weatherData = await getWeather(cityName);
+        const icon = document.getElementById('icon');
+        const description = document.getElementById('description');
+        const displayTemp = document.getElementById('displayTemp');
+        const displaySunrise = document.getElementById('displaySunrise');
+        const displayWind = document.getElementById('displayWind');
+        const displayAbsTemp = document.getElementById('displayAbsTemp');
+
+
+        if (weatherData.cod != '404') {
+
+            const iconRaw = weatherData.weather[0].main;
+            const descRaw = weatherData.weather[0].description;
+            const wind = weatherData.wind.speed;
+            const absTemp = weatherData.main.temp;
+            const feelsTemp = weatherData.main.feels_like;
+            const sunriseTimestamp = weatherData.sys.sunrise;
 
             const sunrise = new Date(sunriseTimestamp * 1000);
             const formatter = new Intl.DateTimeFormat('id-ID', {
@@ -81,56 +92,46 @@ window.addEventListener('load', () => {
             });
 
 
-            let icon_ = '';
-            if (iconRaw == 'Thunderstorm') {
-                icon_ = './icon/cloud-bolt-solid-full.svg';
-            } else if (iconRaw == 'Drizzle') {
-                icon_ = './icon/cloud-rain-solid-full.svg';
-            } else if (iconRaw == 'Rain') {
-                icon_ = './icon/cloud-showers-heavy-solid-full.svg';
-            } else if (iconRaw == 'Snow') {
-                icon_ = './icon/snowflake-regular-full.svg';
-            } else if (iconRaw == 'Atmosphere') {
-                icon_ = './icon/smog-solid-full.svg';
-            } else if (iconRaw == 'Clear') {
-                icon_ = './icon/sun-solid-full.svg';
-            } else {
-                icon_ = './icon/cloud-solid-full.svg';
-            }
 
-            const icon = document.getElementById('icon');
-            const description = document.getElementById('description');
-            const displayTemp = document.getElementById('displayTemp');
-            const displaySunrise = document.getElementById('displaySunrise');
-            const displayWind = document.getElementById('displayWind');
-            const displayAbsTemp = document.getElementById('displayAbsTemp');
+            const weatherIcons = {
+                Thunderstorm: './icon/cloud-bolt-solid-full.svg',
+                Drizzle: './icon/cloud-rain-solid-full.svg',
+                Rain: './icon/cloud-showers-heavy-solid-full.svg',
+                Snow: './icon/snowflake-regular-full.svg',
+                Atmosphere: './icon/smog-solid-full.svg',
+                Clear: './icon/sun-solid-full.svg',
+                Clouds: './icon/cloud-solid-full.svg'
+            };
+
+            const icon_ = weatherIcons[iconRaw] || weatherIcons.Clouds;
+
+            const img = document.createElement('img');
+            img.src = icon_;
+            img.alt = 'icon';
+            img.classList.add('w-[40%]', 'order-1');
+            icon.appendChild(img);
+
 
             displayTemp.textContent = `${(feelsTemp - 273.15).toFixed(1)}°C`;
             displaySunrise.textContent = formatter.format(sunrise);
             displayWind.textContent = `${wind.toFixed(1)}m/s`;
             displayAbsTemp.textContent = `${(absTemp - 273.15).toFixed(1)}°C`;
-            icon.innerHTML = `<img src=${icon_} alt='icon' class='w-[40%]'>`;
             description.textContent = descRaw;
-        }else{
-            const icon = document.getElementById('icon');
-            const description = document.getElementById('description');
-            const displayTemp = document.getElementById('displayTemp');
-            const displaySunrise = document.getElementById('displaySunrise');
-            const displayWind = document.getElementById('displayWind');
-            const displayAbsTemp = document.getElementById('displayAbsTemp');
 
-            icon.textContent = ''
-            description.textContent = 'CITY NOT FOUND!'
-            description.classList.add('text-red-500', 'mt-8', 'font-bold')
-            description.classList.remove('text-gray-200')
-            displaySunrise.textContent = '-'
-            displayWind.textContent = '-'
-            displayAbsTemp.textContent = '-'
+        } else {
+
+            icon.textContent = '';
+            description.textContent = 'PLACE NOT FOUND!';
+            description.classList.add('text-red-500', 'mt-8', 'font-bold');
+            description.classList.remove('text-gray-200');
+            displaySunrise.textContent = '-';
+            displayWind.textContent = '-';
+            displayAbsTemp.textContent = '-';
         }
 
 
     }
-    runWeather()
+    runWeather();
 })
 
 function getFullDay(data) {
@@ -144,14 +145,17 @@ function getFullDay(data) {
 }
 
 async function getWeather(city) {
-    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`);
-    const data = await response.json();
-
     try {
-        return data;
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`);
+
+        if (!response.ok) {
+            throw new Error("Request Failed");
+        }
+
+        return await response.json();
     }
     catch (erorr) {
-        throw new Error("Couldn't fetch", error);
+        console.error(error);
     }
-   
+
 }
